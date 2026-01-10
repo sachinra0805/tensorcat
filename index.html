@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TensorCat - 5,499× Faster Catastrophe Modeling</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0f172a;
+            --secondary: #1e293b;
+            --accent: #06b6d4;
+            --accent-purple: #8b5cf6;
+            --text: #e2e8f0;
+            --text-dim: #94a3b8;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--primary);
+            color: var(--text);
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        .bg-animation {
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+        }
+
+        .bg-animation::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(6, 182, 212, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(6, 182, 212, 0.05) 0%, transparent 50%);
+            animation: backgroundShift 20s ease infinite;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { transform: translate(0, 0); }
+            50% { transform: translate(-50px, -50px); }
+        }
+
+        /* Floating particles */
+        .particle {
+            position: fixed;
+            width: 4px;
+            height: 4px;
+            background: var(--accent);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: float 15s infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+            10% { opacity: 0.3; }
+            90% { opacity: 0.3; }
+            100% { transform: translateY(-100vh) translateX(50px); opacity: 0; }
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 1.5rem 0;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            border-bottom: 1px solid rgba(6, 182, 212, 0.1);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: var(--accent);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .github-btn {
+            padding: 0.7rem 1.5rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .github-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(6, 182, 212, 0.3);
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+        }
+
+        .hero-content {
+            max-width: 1000px;
+            z-index: 10;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background: rgba(6, 182, 212, 0.1);
+            border: 1px solid rgba(6, 182, 212, 0.3);
+            border-radius: 50px;
+            color: var(--accent);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            animation: fadeInUp 0.8s ease;
+        }
+
+        .hero h1 {
+            font-size: 5rem;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ffffff 0%, var(--accent) 50%, var(--accent-purple) 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: fadeInUp 0.8s ease 0.2s backwards;
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-dim);
+            margin-bottom: 3rem;
+            line-height: 1.6;
+            animation: fadeInUp 0.8s ease 0.4s backwards;
+        }
+
+        .hero-highlight {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1.5rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            animation: fadeInUp 0.8s ease 0.6s backwards;
+        }
+
+        .btn-primary {
+            padding: 1.2rem 3rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+            border: none;
+            border-radius: 50px;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(6, 182, 212, 0.4);
+        }
+
+        .btn-secondary {
+            padding: 1.2rem 3rem;
+            background: transparent;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            color: white;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent);
+            background: rgba(6, 182, 212, 0.1);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Stats Section */
+        .stats-hero {
+            max-width: 1400px;
+            margin: -4rem auto 8rem;
+            padding: 0 3rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            z-index: 10;
+            position: relative;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.05), rgba(139, 92, 246, 0.05));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 2.5rem;
+            text-align: center;
+            backdrop-filter: blur(20px);
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(6, 182, 212, 0.5);
+            box-shadow: 0 20px 60px rgba(6, 182, 212, 0.2);
+        }
+
+        .stat-number {
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-dim);
+            font-size: 1.1rem;
+        }
+
+        /* Section Container */
+        .section {
+            max-width: 1400px;
+            margin: 0 auto 8rem;
+            padding: 0 3rem;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-badge {
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+        }
+
+        .section-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-dim);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* Architecture Flow */
+        .kernel-flow {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3rem;
+            margin: 4rem 0;
+        }
+
+        .kernel {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.03), rgba(139, 92, 246, 0.03));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+
+        .kernel:hover {
+            border-color: rgba(6, 182, 212, 0.5);
+            transform: translateY(-5px);
+        }
+
+        .kernel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-purple));
+        }
+
+        .kernel-number {
+            display: inline-block;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+        }
+
+        .kernel h3 {
+            font-size: 1.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .kernel p {
+            color: var(--text-dim);
+            line-height: 1.8;
+        }
+
+        .kernel-stat {
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* Code Block */
+        .code-section {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 4rem 0;
+            overflow-x: auto;
+        }
+
+        .code-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .code-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #ff5f56;
+        }
+
+        .code-dot:nth-child(2) { background: #ffbd2e; }
+        .code-dot:nth-child(3) { background: #27c93f; }
+
+        pre {
+            font-family: 'Courier New', monospace;
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: var(--text);
+        }
+
+        .code-keyword { color: #ff79c6; }
+        .code-function { color: #50fa7b; }
+        .code-string { color: #f1fa8c; }
+        .code-comment { color: #6272a4; }
+        .code-number { color: #bd93f9; }
+
+        /* Performance Comparison */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 3rem;
+            margin: 4rem 0;
+        }
+
+        .comparison-card {
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 3rem;
+            text-align: center;
+        }
+
+        .comparison-card.winner {
+            border-color: var(--accent);
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(139, 92, 246, 0.1));
+        }
+
+        .comparison-label {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            margin-bottom: 1rem;
+        }
+
+        .comparison-time {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+        }
+
+        .comparison-card.winner .comparison-time {
+            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .comparison-desc {
+            color: var(--text-dim);
+        }
+
+        .winner-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            background: var(--accent);
+            color: var(--primary);
+            border-radius: 50px;
+            font-weight: 700;
+            margin-top: 1rem;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            text-align: center;
+            padding: 6rem 3rem;
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(139, 92, 246, 0.1));
+            border-radius: 30px;
+            margin: 8rem auto;
+            max-width: 1400px;
+        }
+
+        .cta-section h2 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-section p {
+            font-size: 1.3rem;
+            color: var(--text-dim);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 4rem 3rem 2rem;
+            text-align: center;
+            color: var(--text-dim);
+        }
+
+        .footer-content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--text-dim);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero h1 { font-size: 4rem; }
+            .kernel-flow { grid-template-columns: 1fr; }
+            .comparison { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hero h1 { font-size: 3rem; }
+            .hero-subtitle { font-size: 1.2rem; }
+            .section-title { font-size: 2.5rem; }
+            .stats-hero { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="bg-animation"></div>
+    
+    <!-- Floating Particles -->
+    <script>
+        for(let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 15 + 's';
+            particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+            document.body.appendChild(particle);
+        }
+    </script>
+
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-container">
+            <div class="logo">
+                <i class="fas fa-bolt"></i>
+                TensorCat
+            </div>
+            <ul class="nav-links">
+                <li><a href="#architecture">Architecture</a></li>
+                <li><a href="#performance">Performance</a></li>
+                <li><a href="#quickstart">Quick Start</a></li>
+                <li><a href="#docs">Docs</a></li>
+            </ul>
+            <a href="https://github.com/sachinra0805/tensorcat" class="github-btn" target="_blank">
+                <i class="fab fa-github"></i> GitHub
+            </a>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-rocket"></i> GPU-Native Catastrophe Modeling
+            </div>
+            <h1>5,499× Faster<br>Hurricane Risk Assessment</h1>
+            <p class="hero-subtitle">
+                Transform <span class="hero-highlight">14 hours</span> of computation into 
+                <span class="hero-highlight">9 seconds</span>. 
+                TensorCat processes 25,000 hurricane events with full physics simulation on consumer GPUs.
+            </p>
+            <div class="hero-buttons">
+                <a href="#quickstart" class="btn-primary">
+                    <i class="fas fa-download"></i> Get Started
+                </a>
+                <a href="https://github.com/sachinra0805/tensorcat" class="btn-secondary" target="_blank">
+                    <i class="fab fa-github"></i> View on GitHub
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Hero -->
+    <div class="stats-hero">
+        <div class="stat-card">
+            <div class="stat-number">5,499×</div>
+            <div class="stat-label">Speedup vs Traditional</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">9.1s</div>
+            <div class="stat-label">25K Events Processed</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">95.1%</div>
+            <div class="stat-label">Computational Reduction</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-number">179M</div>
+            <div class="stat-label">Timestep Evaluations</div>
+        </div>
+    </div>
+
+    <!-- Architecture Section -->
+    <section id="architecture" class="section">
+        <div class="section-header">
+            <div class="section-badge">FOUR-KERNEL ARCHITECTURE</div>
+            <h2 class="section-title">GPU-Native Pipeline</h2>
+            <p class="section-subtitle">
+                Optimized computational flow that reduces memory usage by 44× while maintaining full physics accuracy
+            </p>
+        </div>
+
+        <div class="kernel-flow">
+            <div class="kernel">
+                <div class="kernel-number">1</div>
+                <h3>Spatial Filtering</h3>
+                <p>Pre-filters event-location pairs using GPU-accelerated haversine distance calculations. Eliminates 95%+ of irrelevant computations before they occur.</p>
+                <div class="kernel-stat">
+                    <i class="fas fa-check-circle"></i> 95.1% pair reduction in 1.83s
+                </div>
+            </div>
+
+            <div class="kernel">
+                <div class="kernel-number">2</div>
+                <h3>Temporal Hazard Streaming</h3>
+                <p>Streams physics through time without materializing full spatiotemporal tensors. Captures progressive damage, storm asymmetry, and debris accumulation.</p>
+                <div class="kernel-stat">
+                    <i class="fas fa-check-circle"></i> 69,066 pairs/sec throughput
+                </div>
+            </div>
+
+            <div class="kernel">
+                <div class="kernel-number">3</div>
+                <h3>Vulnerability Assessment</h3>
+                <p>Component-level damage modeling with HAZUS curves. Includes roof, walls, windows, and foundation damage with temporal fatigue effects.</p>
+                <div class="kernel-stat">
+                    <i class="fas fa-check-circle"></i> 0.01s for 486K assessments
+                </div>
+            </div>
+
+            <div class="kernel">
+                <div class="kernel-number">4</div>
+                <h3>Financial Aggregation</h3>
+                <p>Insurance-grade loss computation with policy terms. Generates AAL, PML, TVaR, and exceedance probability curves with sanity checks.</p>
+                <div class="kernel-stat">
+                    <i class="fas fa-check-circle"></i> ✓ All actuarial checks passed
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Example -->
+    <section class="section">
+        <div class="code-section">
+            <div class="code-header">
+                <div class="code-dot"></div>
+                <div class="code-dot"></div>
+                <div class="code-dot"></div>
+            </div>
+            <pre><code><span class="code-keyword">from</span> tensorcat <span class="code-keyword">import</span> TensorCatPipeline, KernelConfig
+<span class="code-keyword">from</span> tensorcat <span class="code-keyword">import</span> load_storm_data
+
+<span class="code-comment"># Load 25,000 hurricane events</span>
+event_tracks, _, event_year_mapping, n_sim_years = <span class="code-function">load_storm_data</span>(
+    <span class="code-string">"df_all.parquet"</span>, 
+    max_events=<span class="code-number">25000</span>
+)
+
+<span class="code-comment"># Configure with MAXIMUM optimization preset</span>
+config = <span class="code-function">KernelConfig</span>(
+    device=<span class="code-string">'cuda'</span>,
+    spatial_filter_radius_km=<span class="code-number">400.0</span>,
+    temporal_batch_size=<span class="code-number">200</span>,
+    use_mixed_precision=<span class="code-keyword">True</span>
+)
+
+<span class="code-comment"># Initialize pipeline</span>
+pipeline = <span class="code-function">TensorCatPipeline</span>(config)
+
+<span class="code-comment"># Run complete analysis - 9.1 seconds for 25K events!</span>
+results = pipeline.<span class="code-function">run_pipeline</span>(
+    event_tracks=event_tracks,
+    location_coords=portfolio_locations,
+    building_values=building_values,
+    event_year_mapping=event_year_mapping,
+    policy_terms={<span class="code-string">'deductible'</span>: <span class="code-number">100000</span>, <span class="code-string">'limit'</span>: <span class="code-number">5000000</span>}
+)
+
+<span class="code-comment"># Access insurance-grade outputs</span>
+<span class="code-function">print</span>(<span class="code-string">f"Expected Annual Loss: ${results['financial']['expected_annual_loss']/1e6:.2f}M"</span>)
+<span class="code-function">print</span>(<span class="code-string">f"100-year PML: ${results['financial']['pml_metrics']['pml_100yr']/1e6:.2f}M"</span>)
+
+<span class="code-comment"># Output:</span>
+<span class="code-comment"># Expected Annual Loss: $3.56M</span>
+<span class="code-comment"># 100-year PML: $15.00M</span>
+<span class="code-comment"># Total time: 9.1 seconds (5,499× faster!)</span></code></pre>
+        </div>
+    </section>
+
+    <!-- Performance Comparison -->
+    <section id="performance" class="section">
+        <div class="section-header">
+            <div class="section-badge">BENCHMARK RESULTS</div>
+            <h2 class="section-title">Real-World Performance</h2>
+            <p class="section-subtitle">
+                Actual benchmark running 25,000 hurricanes across 400 locations on NVIDIA RTX 3060 (6GB)
+            </p>
+        </div>
+
+        <div class="comparison">
+            <div class="comparison-card">
+                <div class="comparison-label">Traditional CPU Model</div>
+                <div class="comparison-time">833 min</div>
+                <div class="comparison-desc">~14 hours processing time</div>
+            </div>
+
+            <div class="comparison-card winner">
+                <div class="comparison-label">TensorCat GPU</div>
+                <div class="comparison-time">9.1 sec</div>
+                <div class="comparison-desc">Sub-10-second analysis</div>
+                <div class="winner-badge">5,499× FASTER</div>
+            </div>
+        </div>
+
+        <!-- Detailed Stats -->
+        <div class="kernel-flow" style="margin-top: 4rem;">
+            <div class="kernel">
+                <h3><i class="fas fa-tachometer-alt"></i> Throughput</h3>
+                <p>
+                    • 2,750 events/second<br>
+                    • 53,455 pairs/second<br>
+                    • 19.7M timestep evaluations/second
+                </p>
+            </div>
+
+            <div class="kernel">
+                <h3><i class="fas fa-memory"></i> Memory Efficiency</h3>
+                <p>
+                    • 0.73GB GPU memory used<br>
+                    • 44× less than traditional (32GB → 0.73GB)<br>
+                    • Runs on consumer GPUs
+                </p>
+            </div>
+
+            <div class="kernel">
+                <h3><i class="fas fa-chart-line"></i> Risk Metrics</h3>
+                <p>
+                    • Expected Annual Loss: $3.56M<br>
+                    • 100-year PML: $15M<br>
+                    • Burn rate: 0.17% ✓ PASS
+                </p>
+            </div>
+
+            <div class="kernel">
+                <h3><i class="fas fa-check-double"></i> Validation</h3>
+                <p>
+                    • All actuarial sanity checks passed<br>
+                    • PML monotonicity: ✓ PASS<br>
+                    • AAL/PML ratio: 0.24 ✓ PASS
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Start -->
+    <section id="quickstart" class="section">
+        <div class="section-header">
+            <div class="section-badge">GET STARTED</div>
+            <h2 class="section-title">Installation</h2>
+            <p class="section-subtitle">
+                Install TensorCat and run your first catastrophe model in under 5 minutes
+            </p>
+        </div>
+
+        <div class="code-section">
+            <div class="code-header">
+                <div class="code-dot"></div>
+                <div class="code-dot"></div>
+                <div class="code-dot"></div>
+            </div>
+            <pre><code><span class="code-comment"># Clone repository</span>
+git clone https://github.com/sachinra0805/tensorcat.git
+cd tensorcat
+
+<span class="code-comment"># Install dependencies</span>
+pip install torch numpy pandas pyarrow
+
+<span class="code-comment"># Run demo with your own data</span>
+python examples/run_tensorcat_demo.py
+
+<span class="code-comment"># Or use in your code</span>
+<span class="code-keyword">from</span> tensorcat <span class="code-keyword">import</span> TensorCatPipeline
+pipeline = <span class="code-function">TensorCatPipeline</span>()
+results = pipeline.<span class="code-function">run_pipeline</span>(...)
+</code></pre>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <div class="cta-section">
+        <h2>Ready to Accelerate Your Risk Models?</h2>
+        <p>
+            Join researchers and practitioners using TensorCat for hurricane risk assessment, 
+            insurance pricing, and climate science.
+        </p>
+        <div style="display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap;">
+            <a href="https://github.com/sachinra0805/tensorcat" class="btn-primary" target="_blank">
+                <i class="fab fa-github"></i> View on GitHub
+            </a>
+            <a href="https://github.com/sachinra0805/tensorcat/issues" class="btn-secondary" target="_blank">
+                <i class="fas fa-comments"></i> Get Support
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="https://github.com/sachinra0805/tensorcat" target="_blank">GitHub</a>
+                <a href="https://github.com/sachinra0805/tensorcat/blob/main/LICENSE" target="_blank">License (Apache 2.0)</a>
+                <a href="https://github.com/sachinra0805/tensorcat/issues" target="_blank">Issues</a>
+                <a href="https://github.com/sachinra0805/tensorcat#citation" target="_blank">Citation</a>
+            </div>
+            <p style="margin-top: 2rem;">
+                © 2026 TensorCat. Built by Sachin Rao & Team. Open source under Apache 2.0.
+            </p>
+        </div>
+    </footer>
+
+    <!-- Scroll Animation -->
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        });
+
+        document.querySelectorAll('.stat-card, .kernel, .comparison-card').forEach((el) => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'all 0.6s ease';
+            observer.observe(el);
+        });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
