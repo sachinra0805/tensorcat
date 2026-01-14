@@ -133,13 +133,7 @@
             display: flex;
             align-items: center;
             gap: 0.5rem;
-        }
-        
-        .logo-text {
-            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--accent);
         }
 
         .mobile-menu-btn {
@@ -237,23 +231,10 @@
             font-weight: 900;
             line-height: 1.2;
             margin-bottom: 1.5rem;
-        }
-        
-        /* Gradient text wrapper for iOS compatibility */
-        .gradient-text {
-            background: linear-gradient(135deg, #ffffff 0%, #06b6d4 50%, #8b5cf6 100%);
+            background: linear-gradient(135deg, #ffffff 0%, var(--accent) 50%, var(--accent-purple) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            display: inline;
-        }
-        
-        .gradient-text-cyan {
-            background: linear-gradient(135deg, #06b6d4, #8b5cf6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            display: inline;
         }
 
         .hero-subtitle {
@@ -348,8 +329,10 @@
             font-size: 2.5rem;
             font-weight: 900;
             margin-bottom: 0.5rem;
-            min-height: 60px;
-            line-height: 60px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .stat-label {
@@ -541,6 +524,13 @@
             line-height: 1;
         }
 
+        .comparison-card.winner .comparison-time {
+            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
         .comparison-desc {
             color: var(--text-dim);
             font-size: 0.95rem;
@@ -653,12 +643,9 @@
             color: var(--accent);
         }
 
-        /* Responsive */
-        @media (max-width: 1024px) {
-            .hero h1 { font-size: 3.5rem; }
-            .section-title { font-size: 2.2rem; }
-        }
-
+        /* ============================================
+           MOBILE OVERRIDES - Solid colors for iOS
+           ============================================ */
         @media (max-width: 768px) {
             .mobile-menu-btn {
                 display: block;
@@ -675,9 +662,32 @@
                 margin-top: 1rem;
             }
 
-            .hero h1 { 
-                font-size: 2.2rem; 
+            /* MOBILE: Use solid colors instead of gradients for text */
+            .hero h1 {
+                font-size: 2.2rem;
                 margin-bottom: 1rem;
+                background: none;
+                -webkit-background-clip: unset;
+                -webkit-text-fill-color: var(--accent);
+                background-clip: unset;
+                color: var(--accent);
+            }
+
+            .stat-number {
+                font-size: 2rem;
+                background: none;
+                -webkit-background-clip: unset;
+                -webkit-text-fill-color: var(--accent);
+                background-clip: unset;
+                color: var(--accent);
+            }
+
+            .comparison-card.winner .comparison-time {
+                background: none;
+                -webkit-background-clip: unset;
+                -webkit-text-fill-color: var(--accent);
+                background-clip: unset;
+                color: var(--accent);
             }
 
             .hero-subtitle { 
@@ -695,12 +705,6 @@
 
             .kernel-flow, .comparison { 
                 grid-template-columns: 1fr; 
-            }
-
-            .stat-number { 
-                font-size: 2rem; 
-                min-height: 50px;
-                line-height: 50px;
             }
 
             .stat-card {
@@ -764,8 +768,13 @@
 
             .stat-number { 
                 font-size: 1.8rem; 
-                min-height: 45px;
-                line-height: 45px;
+            }
+        }
+
+        /* Desktop: Keep gradients */
+        @media (min-width: 769px) {
+            .hero h1 {
+                font-size: 2.8rem;
             }
         }
     </style>
@@ -783,7 +792,7 @@
     <!-- Animated Background -->
     <div class="bg-animation"></div>
     
-    <!-- Floating Particles -->
+    <!-- Floating Particles - Desktop only -->
     <script>
         if (window.innerWidth > 768) {
             for(let i = 0; i < 30; i++) {
@@ -801,8 +810,8 @@
     <nav>
         <div class="nav-container">
             <div class="logo">
-                <i class="fas fa-bolt" style="color: #06b6d4;"></i>
-                <span class="logo-text">TensorCat</span>
+                <i class="fas fa-bolt"></i>
+                TensorCat
             </div>
             <button class="mobile-menu-btn" id="mobileMenuBtn">
                 <i class="fas fa-bars"></i>
@@ -840,7 +849,7 @@
             <div class="hero-badge">
                 <i class="fas fa-rocket"></i> GPU-Native Catastrophe Modeling
             </div>
-            <h1><span class="gradient-text">100× Faster Hurricane Risk Assessment</span></h1>
+            <h1>100× Faster Hurricane Risk Assessment</h1>
             <p class="hero-subtitle">
                 Transform <span class="hero-highlight">14 hours</span> of computation into 
                 <span class="hero-highlight">9 seconds</span>. 
@@ -860,19 +869,19 @@
     <!-- Stats Hero -->
     <div class="stats-hero" id="stats-section">
         <div class="stat-card">
-            <div class="stat-number"><span class="gradient-text-cyan">100×</span></div>
+            <div class="stat-number">100×</div>
             <div class="stat-label">Speedup vs Traditional</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number"><span class="gradient-text-cyan">9.1s</span></div>
+            <div class="stat-number">9.1s</div>
             <div class="stat-label">25K Events Processed</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number"><span class="gradient-text-cyan">95.1%</span></div>
+            <div class="stat-number">95.1%</div>
             <div class="stat-label">Computational Reduction</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number"><span class="gradient-text-cyan">179M</span></div>
+            <div class="stat-number">179M</div>
             <div class="stat-label">Timestep Evaluations</div>
         </div>
     </div>
@@ -993,7 +1002,7 @@ results = pipeline.<span class="code-function">run_pipeline</span>(
 
             <div class="comparison-card winner">
                 <div class="comparison-label">TensorCat GPU</div>
-                <div class="comparison-time"><span class="gradient-text-cyan">9.1 sec</span></div>
+                <div class="comparison-time">9.1 sec</div>
                 <div class="comparison-desc">Sub-10-second analysis</div>
                 <div class="winner-badge">100× FASTER</div>
             </div>
@@ -1141,12 +1150,6 @@ results = pipeline.<span class="code-function">run_pipeline</span>(...)
                 }
             });
         });
-
-        // Performance optimization for mobile - disable particles
-        if (window.innerWidth <= 768) {
-            const particles = document.querySelectorAll('.particle');
-            particles.forEach(p => p.style.display = 'none');
-        }
     </script>
 </body>
 </html>
