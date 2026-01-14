@@ -130,10 +130,10 @@
         .logo {
             font-size: 1.5rem;
             font-weight: 800;
+            color: #06b6d4;
             background: linear-gradient(135deg, var(--accent), var(--accent-purple));
             -webkit-background-clip: text;
             background-clip: text;
-            color: transparent;
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -235,10 +235,12 @@
             font-weight: 900;
             line-height: 1.2;
             margin-bottom: 1.5rem;
+            color: #06b6d4; /* Fallback only */
             background: linear-gradient(135deg, #ffffff 0%, var(--accent) 50%, var(--accent-purple) 100%);
             -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             background-clip: text;
-            color: transparent;
+            /* REMOVE: color: transparent; */
             animation: fadeInUp 0.8s ease 0.2s backwards;
         }
 
@@ -355,16 +357,11 @@
         }
 
         .stat-number {
-            font-size: 2.5rem;
-            font-weight: 900;
+            color: #06b6d4; /* Fallback */
             background: linear-gradient(135deg, var(--accent), var(--accent-purple));
             -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent; /* Key for iOS */
             background-clip: text;
-            color: transparent;
-            margin-bottom: 0.5rem;
-            display: inline-block;
-            min-height: 60px;
-            line-height: 60px;
         }
 
         /* Animated Counter for Stats */
