@@ -130,13 +130,16 @@
         .logo {
             font-size: 1.5rem;
             font-weight: 800;
-            color: #06b6d4;
-            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
-            -webkit-background-clip: text;
-            background-clip: text;
             display: flex;
             align-items: center;
             gap: 0.5rem;
+        }
+        
+        .logo-text {
+            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .mobile-menu-btn {
@@ -227,7 +230,6 @@
             font-size: 0.85rem;
             font-weight: 600;
             margin-bottom: 1.5rem;
-            animation: fadeInUp 0.8s ease;
         }
 
         .hero h1 {
@@ -235,13 +237,23 @@
             font-weight: 900;
             line-height: 1.2;
             margin-bottom: 1.5rem;
-            color: #06b6d4; /* Fallback only */
-            background: linear-gradient(135deg, #ffffff 0%, var(--accent) 50%, var(--accent-purple) 100%);
+        }
+        
+        /* Gradient text wrapper for iOS compatibility */
+        .gradient-text {
+            background: linear-gradient(135deg, #ffffff 0%, #06b6d4 50%, #8b5cf6 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            /* REMOVE: color: transparent; */
-            animation: fadeInUp 0.8s ease 0.2s backwards;
+            display: inline;
+        }
+        
+        .gradient-text-cyan {
+            background: linear-gradient(135deg, #06b6d4, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            display: inline;
         }
 
         .hero-subtitle {
@@ -249,7 +261,6 @@
             color: var(--text-dim);
             margin-bottom: 2.5rem;
             line-height: 1.6;
-            animation: fadeInUp 0.8s ease 0.4s backwards;
             max-width: 800px;
             margin-left: auto;
             margin-right: auto;
@@ -265,7 +276,6 @@
             gap: 1rem;
             justify-content: center;
             flex-wrap: wrap;
-            animation: fadeInUp 0.8s ease 0.6s backwards;
         }
 
         .btn-primary {
@@ -306,17 +316,6 @@
             background: rgba(6, 182, 212, 0.1);
         }
 
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
         /* Stats Section */
         .stats-hero {
             max-width: 1400px;
@@ -337,13 +336,6 @@
             text-align: center;
             backdrop-filter: blur(20px);
             transition: all 0.3s;
-            opacity: 0;
-            transform: translateY(30px);
-        }
-
-        .stat-card.visible {
-            opacity: 1;
-            transform: translateY(0);
         }
 
         .stat-card:hover {
@@ -352,28 +344,10 @@
             box-shadow: 0 20px 60px rgba(6, 182, 212, 0.2);
         }
 
-        .stat-card.visible:hover {
-            transform: translateY(-10px);
-        }
-
         .stat-number {
-            color: #06b6d4; /* Fallback */
-            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent; /* Key for iOS */
-            background-clip: text;
-        }
-
-        /* Animated Counter for Stats */
-        .counter {
             font-size: 2.5rem;
             font-weight: 900;
-            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
             margin-bottom: 0.5rem;
-            display: inline-block;
             min-height: 60px;
             line-height: 60px;
         }
@@ -463,6 +437,7 @@
             font-size: 1.5rem;
             font-weight: 900;
             margin-bottom: 1.5rem;
+            color: white;
         }
 
         .kernel h3 {
@@ -564,13 +539,6 @@
             font-weight: 900;
             margin-bottom: 1rem;
             line-height: 1;
-        }
-
-        .comparison-card.winner .comparison-time {
-            background: linear-gradient(135deg, var(--accent), var(--accent-purple));
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
         }
 
         .comparison-desc {
@@ -729,7 +697,7 @@
                 grid-template-columns: 1fr; 
             }
 
-            .stat-number, .counter { 
+            .stat-number { 
                 font-size: 2rem; 
                 min-height: 50px;
                 line-height: 50px;
@@ -794,7 +762,7 @@
                 gap: 1rem;
             }
 
-            .stat-number, .counter { 
+            .stat-number { 
                 font-size: 1.8rem; 
                 min-height: 45px;
                 line-height: 45px;
@@ -833,8 +801,8 @@
     <nav>
         <div class="nav-container">
             <div class="logo">
-                <i class="fas fa-bolt"></i>
-                TensorCat
+                <i class="fas fa-bolt" style="color: #06b6d4;"></i>
+                <span class="logo-text">TensorCat</span>
             </div>
             <button class="mobile-menu-btn" id="mobileMenuBtn">
                 <i class="fas fa-bars"></i>
@@ -872,7 +840,7 @@
             <div class="hero-badge">
                 <i class="fas fa-rocket"></i> GPU-Native Catastrophe Modeling
             </div>
-            <h1>100× Faster Hurricane Risk Assessment</h1>
+            <h1><span class="gradient-text">100× Faster Hurricane Risk Assessment</span></h1>
             <p class="hero-subtitle">
                 Transform <span class="hero-highlight">14 hours</span> of computation into 
                 <span class="hero-highlight">9 seconds</span>. 
@@ -892,19 +860,19 @@
     <!-- Stats Hero -->
     <div class="stats-hero" id="stats-section">
         <div class="stat-card">
-            <div class="stat-number" data-target="100">0×</div>
+            <div class="stat-number"><span class="gradient-text-cyan">100×</span></div>
             <div class="stat-label">Speedup vs Traditional</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number" data-target="9.1">0s</div>
+            <div class="stat-number"><span class="gradient-text-cyan">9.1s</span></div>
             <div class="stat-label">25K Events Processed</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number" data-target="95.1">0%</div>
+            <div class="stat-number"><span class="gradient-text-cyan">95.1%</span></div>
             <div class="stat-label">Computational Reduction</div>
         </div>
         <div class="stat-card">
-            <div class="stat-number" data-target="179">0M</div>
+            <div class="stat-number"><span class="gradient-text-cyan">179M</span></div>
             <div class="stat-label">Timestep Evaluations</div>
         </div>
     </div>
@@ -1025,7 +993,7 @@ results = pipeline.<span class="code-function">run_pipeline</span>(
 
             <div class="comparison-card winner">
                 <div class="comparison-label">TensorCat GPU</div>
-                <div class="comparison-time">9.1 sec</div>
+                <div class="comparison-time"><span class="gradient-text-cyan">9.1 sec</span></div>
                 <div class="comparison-desc">Sub-10-second analysis</div>
                 <div class="winner-badge">100× FASTER</div>
             </div>
@@ -1157,104 +1125,6 @@ results = pipeline.<span class="code-function">run_pipeline</span>(...)
             });
         });
 
-        // Animated Counter Function
-        function animateCounter(element, target, suffix = '') {
-            const speed = 50; // Lower is faster
-            const increment = target / (1000 / speed);
-            let current = 0;
-            
-            const timer = setInterval(() => {
-                current += increment;
-                if (current >= target) {
-                    current = target;
-                    clearInterval(timer);
-                }
-                
-                if (suffix === 'M') {
-                    // For 179M, show as integer
-                    element.textContent = Math.floor(current) + suffix;
-                } else if (suffix === '×') {
-                    // For 100×, show as integer
-                    element.textContent = Math.floor(current) + suffix;
-                } else if (suffix === '%') {
-                    // For 95.1%, show with one decimal
-                    element.textContent = current.toFixed(1) + suffix;
-                } else if (suffix === 's') {
-                    // For 9.1s, show with one decimal
-                    element.textContent = current.toFixed(1) + suffix;
-                }
-            }, speed);
-        }
-
-        // Stats animation with Intersection Observer
-        const statsObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    const statCards = entry.target.querySelectorAll('.stat-card');
-                    
-                    statCards.forEach((card, index) => {
-                        // Animate card appearance
-                        setTimeout(() => {
-                            card.classList.add('visible');
-                            card.style.transition = 'all 0.6s ease ' + (index * 0.1) + 's';
-                        }, 100);
-                        
-                        // Animate numbers
-                        const numberElement = card.querySelector('.stat-number');
-                        if (numberElement) {
-                            const target = parseFloat(numberElement.getAttribute('data-target'));
-                            const text = numberElement.textContent;
-                            let suffix = '';
-                            
-                            // Determine suffix based on text content
-                            if (text.includes('×')) suffix = '×';
-                            else if (text.includes('s')) suffix = 's';
-                            else if (text.includes('%')) suffix = '%';
-                            else if (text.includes('M')) suffix = 'M';
-                            
-                            // Start counter animation after card appears
-                            setTimeout(() => {
-                                animateCounter(numberElement, target, suffix);
-                            }, 600 + (index * 100));
-                        }
-                    });
-                    
-                    // Stop observing after animation
-                    statsObserver.unobserve(entry.target);
-                }
-            });
-        }, {
-            threshold: 0.3,
-            rootMargin: '50px'
-        });
-
-        // Observe stats section
-        const statsSection = document.getElementById('stats-section');
-        if (statsSection) {
-            statsObserver.observe(statsSection);
-        }
-
-        // Scroll animation for other elements
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, {
-            threshold: 0.1,
-            rootMargin: '50px'
-        });
-
-        // Observe kernels and comparison cards
-        document.querySelectorAll('.kernel, .comparison-card').forEach((el) => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(30px)';
-            el.style.transition = 'all 0.6s ease';
-            observer.observe(el);
-        });
-
         // Smooth scroll
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
@@ -1272,38 +1142,10 @@ results = pipeline.<span class="code-function">run_pipeline</span>(...)
             });
         });
 
-        // Performance optimization for mobile
+        // Performance optimization for mobile - disable particles
         if (window.innerWidth <= 768) {
-            // Reduce particle count on mobile
             const particles = document.querySelectorAll('.particle');
             particles.forEach(p => p.style.display = 'none');
-        }
-
-        // Fallback for stats if IntersectionObserver is not supported
-        if (!('IntersectionObserver' in window)) {
-            const statNumbers = document.querySelectorAll('.stat-number');
-            statNumbers.forEach((element, index) => {
-                setTimeout(() => {
-                    const target = parseFloat(element.getAttribute('data-target'));
-                    const text = element.textContent;
-                    let suffix = '';
-                    
-                    if (text.includes('×')) suffix = '×';
-                    else if (text.includes('s')) suffix = 's';
-                    else if (text.includes('%')) suffix = '%';
-                    else if (text.includes('M')) suffix = 'M';
-                    
-                    animateCounter(element, target, suffix);
-                }, 500 + (index * 200));
-            });
-            
-            // Make cards visible
-            const statCards = document.querySelectorAll('.stat-card');
-            statCards.forEach((card, index) => {
-                setTimeout(() => {
-                    card.classList.add('visible');
-                }, 300 + (index * 100));
-            });
         }
     </script>
 </body>
